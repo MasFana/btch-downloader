@@ -49,6 +49,7 @@ async function _fetchapi(endpoint: string, url: string): Promise<any> {
         throw new Error(`Error fetching from ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
+
 /**
  * TikTok video downloader
  * @async
