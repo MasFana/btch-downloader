@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
 import { version,author, config } from '../package.json';
 import {
     BaseResponse,
@@ -29,19 +28,27 @@ const BASE_DEVELOPER = author;
  */
 async function _fetchapi(endpoint: string, url: string): Promise<any> {
     try {
-        const response: AxiosResponse = await axios.get(`${config.baseUrl}/${endpoint}`, {
-            params: { url },
+        const baseUrl = config.baseUrl; // Assuming config.baseUrl is available
+        const apiUrl = new URL(`${baseUrl}/${endpoint}`);
+        apiUrl.searchParams.append('url', url);
+
+        const response = await fetch(apiUrl.toString(), {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'User-Agent': `btch/${version}`
             }
         });
-        return response.data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
     } catch (error) {
         throw new Error(`Error fetching from ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
-
 /**
  * TikTok video downloader
  * @async

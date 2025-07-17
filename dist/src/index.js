@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fbdown = fbdown;
 exports.igdl = igdl;
@@ -21,7 +18,6 @@ exports.mediafire = mediafire;
 exports.capcut = capcut;
 exports.gdrive = gdrive;
 exports.pinterest = pinterest;
-const axios_1 = __importDefault(require("axios"));
 const package_json_1 = require("../package.json");
 const BASE_DEVELOPER = package_json_1.author;
 /**
@@ -39,14 +35,20 @@ const BASE_DEVELOPER = package_json_1.author;
 function _fetchapi(endpoint, url) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield axios_1.default.get(`${package_json_1.config.baseUrl}/${endpoint}`, {
-                params: { url },
+            const baseUrl = package_json_1.config.baseUrl; // Assuming config.baseUrl is available
+            const apiUrl = new URL(`${baseUrl}/${endpoint}`);
+            apiUrl.searchParams.append('url', url);
+            const response = yield fetch(apiUrl.toString(), {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'User-Agent': `btch/${package_json_1.version}`
                 }
             });
-            return response.data;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return yield response.json();
         }
         catch (error) {
             throw new Error(`Error fetching from ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`);
